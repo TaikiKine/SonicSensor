@@ -11,16 +11,25 @@ void ofApp::setup(){
 	
 	int baud = 57600;
     serial.setup(0, baud);
+    
+    result = 0;
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
    
-    static int nRead = 0;
-    nRead = serial.readByte();
-    if (nRead == OF_SERIAL_NO_DATA);
-    else if(nRead == OF_SERIAL_ERROR);
-    else cout << nRead << endl;
+    serial.writeByte('a');
+    
+    if (serial.available() > 0) {
+        
+        int highByte = serial.readByte();
+        int lowByte = serial.readByte();
+        if (highByte == OF_SERIAL_ERROR || lowByte == OF_SERIAL_ERROR);
+        else if (lowByte == OF_SERIAL_NO_DATA || lowByte == OF_SERIAL_NO_DATA);
+        else result =  (highByte<<8) + lowByte;
+        
+        cout << result << endl;
+    }
 }
 
 //--------------------------------------------------------------
