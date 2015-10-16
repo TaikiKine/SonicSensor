@@ -1,5 +1,7 @@
 #define pingPin  7       // センサー接続のピン番号
 
+const int threshold = 12000;
+
 //  電源起動時とリセットの時だけのみ処理される関数(初期化と設定処理)
 void setup() {
   Serial.begin(57600) ;   // 57600bpsでシリアル通信のポートを開きます
@@ -8,9 +10,12 @@ void setup() {
 void loop() {
      int cm ;
      int mm ;
+     int result;
      
      cm = UsonicMeasurRead(pingPin) ;   // センサーから距離を調べる
-     mm = cm ;
+     result = map(cm, 0, threshold, 0, 255);
+     Serial.write(result);
+     
      if(mm <= 20){
       mm = 0;
      }else if(mm > 20 && mm <= 40){
@@ -32,13 +37,8 @@ void loop() {
      }else if(mm > 180 && mm <= 200){
       mm = 9;
      }
-
      
-//     Serial.print(cm) ;                 // 距離を表示する
-//     Serial.print(" : ") ;
-     Serial.print(mm);
-//     Serial.write(cm);
-//     Serial.println("cm") ;
+     //Serial.print(mm);
 
      delay(100) ;                      // 0.02s後に繰り返す
 }
@@ -57,10 +57,11 @@ int UsonicMeasurRead(int pin)
      digitalWrite(pin, HIGH) ;
      delayMicroseconds(5) ;
      digitalWrite(pin, LOW) ;
+
      // センサーからの反射パルスを受信する
      pinMode(pin, INPUT) ;              // ピンを入力モードにする
      t = pulseIn(pin, HIGH) ;           // パルス幅の時間を測る
-     if (t < 12000) {                   // ３ｍ以上の距離は計算しない
+     if (t < threshold) {                   // ３ｍ以上の距離は計算しない
           ans = (t / 29) / 2 ;          // 往復なので２で割る
      } else ans = 0 ;
      
